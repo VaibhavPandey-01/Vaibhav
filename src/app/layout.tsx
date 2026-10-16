@@ -1,15 +1,9 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
 import "./globals.css";
 
-const outfit = Outfit({
-  subsets: ["latin"],
-  variable: "--font-outfit",
-});
-
 export const metadata: Metadata = {
-  title: "Vaibhav Pandey | C++ Developer",
-  description: "I build structured thinking into digital systems. C++ Developer based in Greater Noida.",
+  title: "Vaibhav Pandey — Software & AI Developer",
+  description: "Computer Science & AI/ML student at IILM University. Building offline AI, mobile applications, and software for real-world problems.",
 };
 
 import { SmoothScrollProvider } from "@/components/SmoothScrollProvider";
@@ -20,8 +14,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark no-scrollbar">
-      <body className={`${outfit.variable} font-sans antialiased bg-black text-white selection:bg-accent/30 selection:text-white`}>
+    <html lang="en">
+      <body>
         <SmoothScrollProvider>
           {children}
         </SmoothScrollProvider>

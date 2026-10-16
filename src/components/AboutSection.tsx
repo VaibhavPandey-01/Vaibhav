@@ -34,7 +34,7 @@ export function AboutSection() {
                         solutions that operate with deep performance and reliability.
                     </p>
                     <p>
-                        My curiosity extends well beyond the compiler—I'm actively exploring AI
+                        My curiosity extends well beyond the compiler—I&apos;m actively exploring AI
                         tools and modern frontend environments, treating every technical layer as
                         a new foundation for problem-solving.
                     </p>
