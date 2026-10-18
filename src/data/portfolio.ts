@@ -1,4 +1,10 @@
-export const profile = { email: "pandeyvaibhav0310@gmail.com", github: "", linkedin: "" };
+export const profile = {
+  email: "pandeyvaibhav0310@gmail.com",
+  github: "https://github.com/VaibhavPandey-01",
+  linkedin: "https://www.linkedin.com/in/vaibhav-pandey-a9006338b/",
+  phone: "+91 9369868977",
+  phoneHref: "tel:+919369868977",
+};
 
 export const projects = [
   {

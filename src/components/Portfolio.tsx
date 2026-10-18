@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
-import { ArrowDown, ArrowUpRight, ArrowRight, Check, Copy, X, Menu, Sparkles, Cpu, Code2, Layers, Database, MapPin, Download } from "lucide-react";
+import { ArrowDown, ArrowUpRight, ArrowRight, Check, Copy, X, Menu, Sparkles, Cpu, Code2, Layers, Database, MapPin, Download, Github, Linkedin, Phone } from "lucide-react";
 import { projects, profile, skills } from "@/data/portfolio";
 import { SignalOrb } from "./SignalOrb";
 import { ProjectArtwork } from "./ProjectArtwork";
@@ -10,6 +10,24 @@ import { IntelligenceLab } from "./IntelligenceLab";
 
 type Project = typeof projects[number];
 const icons = [Code2, Cpu, Layers, Database];
+
+const contactLinks = [
+  { label: "LinkedIn", detail: "Vaibhav Pandey", description: "Let’s connect professionally", href: profile.linkedin, icon: Linkedin, external: true },
+  { label: "GitHub", detail: "VaibhavPandey-01", description: "Explore the code behind the work", href: profile.github, icon: Github, external: true },
+  { label: "Phone", detail: profile.phone, description: "Start a conversation", href: profile.phoneHref, icon: Phone, external: false },
+];
+
+function ContactLinks({ compact = false }: { compact?: boolean }) {
+  return <nav className={compact ? "hero-socials" : "contact-cards"} aria-label={compact ? "Quick contact links" : "Connect with Vaibhav"}>
+    {contactLinks.map(({ label, detail, description, href, icon: Icon, external }) => (
+      <a key={label} href={href} target={external ? "_blank" : undefined} rel={external ? "noopener noreferrer" : undefined}>
+        <Icon size={compact ? 15 : 22} aria-hidden="true" />
+        {compact ? <span>{label === "Phone" ? detail : label}</span> : <div><span className="contact-label">{label}</span><strong>{detail}</strong><span className="contact-description">{description}</span></div>}
+        {!compact && <ArrowUpRight size={18} className="contact-card-arrow" aria-hidden="true" />}
+      </a>
+    ))}
+  </nav>;
+}
 
 function Reveal({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return <motion.div className={className} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.12 }} transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}>{children}</motion.div>;
@@ -55,6 +73,7 @@ export function Portfolio() {
             <h1><span>Curiosity.</span><span>Code.</span><span className="hero-impact">Real impact<span className="period">.</span></span></h1>
             <p className="hero-description">I build software that meets the real world.<br />From AI that works offline to apps that bring people together.</p>
             <div className="hero-actions"><a className="button button-primary" href="#work">Explore my work <ArrowDown size={17} /></a><a className="text-link" href="/Vaibhav-Pandey-CV.docx" download>Download CV <Download size={15} /></a></div>
+            <ContactLinks compact />
           </div>
           <div className="hero-scene"><SignalOrb mode={orbMode} /><span className="scene-coordinate coordinate-top">FIG. 001 — CONNECTED THINKING</span><span className="scene-coordinate coordinate-side">28.47° N / 77.50° E</span><div className="scene-caption"><span className="scene-cross">+</span><span>Human curiosity.<br /><strong>Machine possibilities.</strong></span></div><div className="orb-controls" aria-label="Particle sculpture shape">{["Sphere", "Orbit", "Wave"].map((label, index) => <button key={label} onClick={() => setOrbMode(index)} aria-pressed={orbMode === index}><span>0{index + 1}</span>{label}</button>)}</div></div>
         </div>
@@ -74,7 +93,7 @@ export function Portfolio() {
           ["APR 2026", "Ideas under pressure", "Promptaethon · Ignite Tech Fest", "Secured second place in an AI prompting challenge. Built AI Study Buddy and explored prompt design, iteration, and reliable structured outputs."],
           ["2025 — 2029", "The foundation", "B.Tech CSE · AI & ML", "Studying Computer Science & Engineering with a specialization in Artificial Intelligence and Machine Learning at IILM University, Greater Noida."],
         ].map(([date, title, role, description]) => <Reveal className="timeline-item" key={date}><span className="timeline-dot" /><span className="eyebrow">{date}</span><h3>{title}</h3><span className="timeline-role">{role}</span><p>{description}</p></Reveal>)}</div></div></section>
-      <section id="contact" className="contact-section shell section-space"><Reveal><p className="eyebrow"><i className="status-dot" /> OPEN TO INTERNSHIPS & INTERESTING CONVERSATIONS</p><h2>Have something<br />in <em>mind?</em><a href={`mailto:${profile.email}`} aria-label="Email Vaibhav" className="contact-arrow"><ArrowUpRight /></a></h2><div className="contact-bottom"><p>A project, an opportunity, or a good question.<br />I’d love to hear it.</p><div className="email-row"><a href={`mailto:${profile.email}`}>{profile.email}</a><button onClick={copy} aria-label={copied ? "Email copied" : "Copy email address"}>{copied ? <Check size={18} /> : <Copy size={18} />}</button><span className="copy-message" role="status">{copied ? "Copied!" : ""}</span></div></div></Reveal></section>
+      <section id="contact" className="contact-section shell section-space"><Reveal><p className="eyebrow"><i className="status-dot" /> OPEN TO INTERNSHIPS & INTERESTING CONVERSATIONS</p><h2>Have something<br />in <em>mind?</em><a href={`mailto:${profile.email}`} aria-label="Email Vaibhav" className="contact-arrow"><ArrowUpRight /></a></h2><div className="contact-bottom"><p>A project, an opportunity, or a good question.<br />I’d love to hear it.</p><div className="email-row"><a href={`mailto:${profile.email}`}>{profile.email}</a><button onClick={copy} aria-label={copied ? "Email copied" : "Copy email address"}>{copied ? <Check size={18} /> : <Copy size={18} />}</button><span className="copy-message" role="status">{copied ? "Copied!" : ""}</span></div></div><ContactLinks /></Reveal></section>
     </main>
     <footer className="site-footer shell"><a className="wordmark" href="#home">v<span>p</span><i /></a><span>© {new Date().getFullYear()} Vaibhav Pandey</span><span className="footer-note">MADE OF CURIOSITY & CODE</span><a href="#home">Back to top <ArrowUpRight size={15} /></a></footer>
     <dialog ref={dialog} className="project-dialog" aria-label={selected ? `${selected.name} project details` : "Project details"} onCancel={close} onClick={e => { if (e.target === e.currentTarget) close(); }} onClose={() => setSelected(null)}>{selected && <div className={`dialog-content ${selected.color}`}><button className="dialog-close" onClick={close} aria-label="Close project details" autoFocus><X /></button><p className="eyebrow">{selected.category} / {selected.year}</p><h2>{selected.name}</h2><p className="dialog-headline">{selected.title}</p><div className="dialog-metric"><strong>{selected.metric}</strong><span>{selected.metricLabel}</span></div><p>{selected.detail}</p><h3>Inside the build</h3><ul>{selected.points.map(point => <li key={point}>{point}</li>)}</ul><div className="tags">{selected.tags.map(tag => <span key={tag}>{tag}</span>)}</div>{selected.repo && <a className="button button-primary" href={selected.repo} target="_blank" rel="noreferrer">View source <ArrowUpRight size={16} /></a>}<a className="text-link" href={`mailto:${profile.email}?subject=${encodeURIComponent(`Let's talk about ${selected.name}`)}`}>Ask me about this project <ArrowUpRight size={16} /></a></div>}</dialog>

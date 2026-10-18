@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+.hero-socials { display:flex; flex-wrap:wrap; gap:12px 22px; margin-top:26px; }
+.hero-socials a { display:inline-flex; align-items:center; gap:8px; min-height:36px; font-size:11px; color:var(--muted); transition:color .2s; }
+.hero-socials a:hover { color:var(--accent); }
+.contact-cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin-top:48px; }
+.contact-cards > a { position:relative; display:flex; align-items:flex-start; gap:16px; padding:28px 22px; background:var(--surface); border:1px solid var(--line); border-radius:8px; transition:transform .25s,border-color .25s,background .25s; }
+.contact-cards > a:hover { transform:translateY(-5px); border-color:var(--accent); background:#20211e; }
+.contact-cards > a > svg:first-child { color:var(--accent); margin-top:2px; }
+.contact-cards > a > div { min-width:0; }
+.contact-label { display:block; color:var(--muted); font:9px/1.6 "Courier New",monospace; letter-spacing:1.4px; text-transform:uppercase; }
+.contact-cards strong { display:block; font-size:16px; font-weight:500; letter-spacing:-.3px; margin:12px 0 9px; overflow-wrap:anywhere; }
+.contact-description { display:block; color:var(--muted); font-size:11px; line-height:1.7; }
+.contact-card-arrow { position:absolute; top:22px; right:18px; color:var(--muted); transition:color .25s,transform .25s; }
+.contact-cards > a:hover .contact-card-arrow { color:var(--accent); transform:translate(2px,-2px); }
+@media(max-width:1000px) { .contact-cards { gap:10px; }.contact-cards > a { padding:24px 16px; gap:12px; }.contact-cards strong { font-size:14px; }.contact-card-arrow { width:14px; right:12px; top:15px; } }
+@media(max-width:700px) { .contact-cards { grid-template-columns:1fr; margin-top:36px; gap:12px; }.contact-cards > a { padding:24px; gap:18px; }.contact-cards strong { font-size:18px; margin-block:7px; }.contact-card-arrow { top:26px; right:22px; width:18px; }.hero-socials { gap:6px 18px; margin-top:20px; } }
+
 :root { --bg:#111211; --surface:#191a18; --text:#edece4; --muted:#a1a39a; --line:#ffffff1c; --accent:#ff795d; --font-sans:Arial,Helvetica,sans-serif; }
 * { box-sizing:border-box; }
 html { position:relative; scroll-behavior:smooth; scroll-padding-top:95px; }
