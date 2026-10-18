@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useSpring } from "framer-motion";
+import { motion, useScroll, useSpring, useReducedMotion } from "framer-motion";
+import { AmbientExperience, OrbitDetails } from "./AmbientExperience";
 import { ArrowDown, ArrowUpRight, ArrowRight, Check, Copy, X, Menu, Sparkles, Cpu, Code2, Layers, Database, MapPin, Download, Github, Linkedin, Phone } from "lucide-react";
 import { projects, profile, skills } from "@/data/portfolio";
 import { SignalOrb } from "./SignalOrb";
@@ -30,7 +31,8 @@ function ContactLinks({ compact = false }: { compact?: boolean }) {
 }
 
 function Reveal({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <motion.div className={className} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.12 }} transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}>{children}</motion.div>;
+  const reduced = useReducedMotion();
+  return <motion.div className={className} initial={{ opacity: 0, y: reduced ? 0 : 42, filter: reduced ? "none" : "blur(8px)" }} whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }} viewport={{ once: true, amount: 0.12 }} transition={{ duration: reduced ? 0 : 0.85, ease: [0.22, 1, 0.36, 1] }}>{children}</motion.div>;
 }
 
 export function Portfolio() {
@@ -55,6 +57,7 @@ export function Portfolio() {
   const copy = async () => { try { await navigator.clipboard.writeText(profile.email); setCopied(true); copyTimer.current = setTimeout(() => setCopied(false), 2500); } catch { window.location.href = `mailto:${profile.email}`; } };
   const close = () => setSelected(null);
   return <>
+    <AmbientExperience />
     <a className="skip-link" href="#work">Skip to projects</a>
     <motion.div className="reading-progress" style={{ scaleX: progress }} />
     <header className="site-header">
@@ -70,12 +73,12 @@ export function Portfolio() {
         <div className="hero-topline"><span className="eyebrow"><i className="status-dot" /> OPEN TO INTERNSHIPS</span><span className="eyebrow hero-location">GREATER NOIDA, INDIA ↗</span></div>
         <div className="hero-content">
           <div className="hero-copy"><motion.p className="hero-intro" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }}>Hey, I’m Vaibhav Pandey.</motion.p>
-            <h1><span>Curiosity.</span><span>Code.</span><span className="hero-impact">Real impact<span className="period">.</span></span></h1>
+            <h1 aria-label="Curiosity. Code. Real impact.">{["Curiosity.", "Code.", "Real impact."].map((line, index) => <span className="headline-mask" aria-hidden="true" key={line}><motion.span className={index === 2 ? "hero-impact" : ""} initial={{ y: "110%", rotate: 3 }} animate={{ y: 0, rotate: 0 }} transition={{ duration: 1.1, delay: 0.15 + index * 0.16, ease: [0.22, 1, 0.36, 1] }}>{line}</motion.span></span>)}</h1>
             <p className="hero-description">I build software that meets the real world.<br />From AI that works offline to apps that bring people together.</p>
             <div className="hero-actions"><a className="button button-primary" href="#work">Explore my work <ArrowDown size={17} /></a><a className="text-link" href="/Vaibhav-Pandey-CV.docx" download>Download CV <Download size={15} /></a></div>
             <ContactLinks compact />
           </div>
-          <div className="hero-scene"><SignalOrb mode={orbMode} /><span className="scene-coordinate coordinate-top">FIG. 001 — CONNECTED THINKING</span><span className="scene-coordinate coordinate-side">28.47° N / 77.50° E</span><div className="scene-caption"><span className="scene-cross">+</span><span>Human curiosity.<br /><strong>Machine possibilities.</strong></span></div><div className="orb-controls" aria-label="Particle sculpture shape">{["Sphere", "Orbit", "Wave"].map((label, index) => <button key={label} onClick={() => setOrbMode(index)} aria-pressed={orbMode === index}><span>0{index + 1}</span>{label}</button>)}</div></div>
+          <div className="hero-scene"><SignalOrb mode={orbMode} /><OrbitDetails /><span className="scene-coordinate coordinate-top">FIG. 001 — CONNECTED THINKING</span><span className="scene-coordinate coordinate-side">28.47° N / 77.50° E</span><div className="scene-caption"><span className="scene-cross">+</span><span>Human curiosity.<br /><strong>Machine possibilities.</strong></span></div><div className="orb-controls" aria-label="Particle sculpture shape">{["Sphere", "Orbit", "Wave"].map((label, index) => <button key={label} onClick={() => setOrbMode(index)} aria-pressed={orbMode === index}><span>0{index + 1}</span>{label}</button>)}</div></div>
         </div>
         <div className="hero-bottom"><span>SOFTWARE DEVELOPMENT <i /> APPLIED AI <i /> CREATIVE PROBLEM SOLVING</span><a href="#work">SCROLL TO DISCOVER <ArrowDown size={13} /></a></div>
       </section>
