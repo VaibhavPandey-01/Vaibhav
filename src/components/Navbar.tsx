@@ -37,9 +37,9 @@ export function Navbar() {
 
                 {/* Right: "Hire Me" button with glow hover */}
                 <div>
-                    <button className="px-6 py-2.5 rounded-full text-sm font-semibold tracking-wide text-white bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 hover:accent-glow hover:text-[#ff0033] hover:shadow-[0_0_15px_rgba(255,0,51,0.6)] transition-all duration-300">
+                    <a href="#contact" className="px-6 py-2.5 rounded-full text-sm font-semibold tracking-wide text-white bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 hover:accent-glow hover:text-[#ff0033] hover:shadow-[0_0_15px_rgba(255,0,51,0.6)] transition-all duration-300">
                         Hire Me
-                    </button>
+                    </a>
                 </div>
             </div>
         </motion.header>
