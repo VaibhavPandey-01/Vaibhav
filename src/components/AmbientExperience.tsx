@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { Code2, Cpu, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 export function AmbientExperience() {
   useEffect(() => {
@@ -24,11 +24,12 @@ export function AmbientExperience() {
   return <div className="ambient-world" aria-hidden="true"><div className="ambient-cloud cloud-one" /><div className="ambient-cloud cloud-two" /><div className="ambient-grid" /></div>;
 }
 
-export function OrbitDetails() {
-  return <div className="orbit-details" aria-hidden="true">
-    <div className="orb-ring ring-one" /><div className="orb-ring ring-two" />
-    <div className="orbit-badge badge-code"><Code2 size={19} /><span>BUILD WITH PURPOSE<small>Ideas → working software</small></span></div>
-    <div className="orbit-badge badge-ai"><Cpu size={19} /><span>INTELLIGENCE, LOCAL<small>Beyond the cloud</small></span></div>
-    <div className="orbit-spark"><Sparkles size={23} /></div>
+export function OrbitDetails({ mode = 0 }: { mode?: number }) {
+  return <div className="orbit-details particle-details" aria-hidden="true">
+    <div className="stage-heading"><span>THE ART OF BECOMING</span><span>4,200 POINTS / ONE IDEA</span></div>
+    <i className="stage-corner corner-a" /><i className="stage-corner corner-b" />
+    <div className="constellation-track" />
+    <div className="code-fragment" key={mode}><span>{mode === 0 ? "01 / C++" : "02 / PYTHON"}</span><code>{mode === 0 ? "while (curious) { build(); }" : "for idea in curiosity: build(idea)"}</code></div>
+    <div className="particle-invitation"><Sparkles size={13} /><span>Small pieces.<br /><strong>Infinite possibilities.</strong></span></div>
   </div>;
 }

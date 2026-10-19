@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./particles.css";
 
 export const metadata: Metadata = {
   title: "Vaibhav Pandey — Software & AI Developer",

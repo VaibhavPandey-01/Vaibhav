@@ -1,0 +1,36 @@
+/* A quiet frame for a living particle study. */
+.language-stage { --particle-accent:#ffb18e; width:100%; margin-left:0; opacity:1; }
+.stage-python { --particle-accent:#96cfff; }
+.particle-sculpture { inset:5% 0 13%; }
+.particle-sculpture .signal-orb { filter:none; }
+.particle-details { inset:0; }
+.stage-heading { position:absolute; top:5%; left:7%; right:5%; display:flex; justify-content:space-between; gap:15px; color:#b5abb6; font:8px/1.6 "Courier New",monospace; letter-spacing:1.6px; }
+.stage-heading > span:last-child { color:#7c7489; font-size:7px; }
+.stage-corner { position:absolute; width:20px; height:20px; border-color:#ffffff23; border-style:solid; }
+.corner-a { top:13%; left:4%; border-width:1px 0 0 1px; }
+.corner-b { bottom:26%; right:3%; border-width:0 1px 1px 0; }
+.constellation-track { position:absolute; inset:17% 5% 28%; border:1px solid #ccbfff08; border-radius:50%; transform:rotate(-17deg); }
+.code-fragment { position:absolute; bottom:24%; left:7%; animation:soft-enter .6s both; }
+.code-fragment > span { display:block; color:var(--particle-accent); font:8px "Courier New",monospace; letter-spacing:2px; margin-bottom:10px; }
+.code-fragment code { font:10px "Courier New",monospace; color:#b3abbc; }
+.particle-invitation { position:absolute; right:6%; bottom:14%; display:flex; gap:9px; align-items:flex-start; color:var(--particle-accent); }
+.particle-invitation svg { animation:brand-spin 10s ease-in-out infinite; }
+.particle-invitation span { font:9px/1.8 "Courier New",monospace; color:#8d8798; }
+.particle-invitation strong { font-weight:400; color:#c1b9c7; }
+.formation-status { position:absolute; left:7%; bottom:2%; display:flex; align-items:center; gap:8px; color:var(--particle-accent); font:7px/1.5 "Courier New",monospace; letter-spacing:1.1px; }
+.formation-status > i { width:4px; height:4px; border-radius:50%; background:currentColor; box-shadow:0 0 12px currentColor; }
+.formation-status span { display:none; }
+[data-phase="scatter"] .phase-scatter,[data-phase="gather"] .phase-gather,[data-phase="formed"] .phase-formed { display:block; }
+.language-sculpture:not([data-ready="true"]) .formation-status { display:none; }
+.particle-controls { position:absolute; bottom:3%; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:12px; white-space:nowrap; }
+.particle-controls .orb-controls { position:static; transform:none; background:#15141caa; border-color:#ffffff15; }
+.particle-controls .orb-controls button { min-height:38px; padding:10px 17px; }
+.particle-controls .orb-controls button[aria-pressed=true] { background:var(--particle-accent); color:#1b171c; box-shadow:0 2px 18px #ffb18e15; }
+.reform-button { display:flex; align-items:center; gap:7px; min-height:40px; padding:10px; background:none; color:#a8a1b2; font-size:10px; border-radius:20px; transition:color .25s,background .25s; }
+.reform-button:hover { color:var(--particle-accent); background:#ffffff06; }
+.reform-button svg { transition:transform .5s; }.reform-button:hover svg { transform:rotate(-180deg); }
+.particle-hint { position:absolute; bottom:-3%; width:100%; text-align:center; font-size:9px; color:#908797; letter-spacing:.2px; }
+@media(min-width:1101px) { .language-stage { margin-top:0; } }
+@media(min-width:601px) and (max-width:800px) { .hero-content { grid-template-columns:1fr 1fr; }.language-stage { width:115%; margin-left:-10%; min-height:440px; }.stage-heading { top:6%; font-size:7px; letter-spacing:1px; }.stage-heading > span:last-child { display:none; }.particle-invitation { display:none; }.code-fragment { bottom:24%; }.code-fragment code { font-size:8px; }.formation-status { font-size:6px; }.particle-hint { font-size:8px; } }
+@media(max-width:600px) { .language-stage { height:410px; width:100%; margin:30px 0 40px; }.particle-sculpture { inset:4% -2% 12%; }.stage-heading { top:4%; left:4%; right:4%; font-size:7px; letter-spacing:1px; }.stage-heading > span:last-child { font-size:6px; }.code-fragment { left:4%; bottom:24%; }.code-fragment code { font-size:9px; }.particle-invitation { right:3%; bottom:14%; }.particle-invitation span { font-size:8px; }.formation-status { left:6%; font-size:6px; letter-spacing:.7px; }.particle-controls { bottom:2%; }.particle-hint { bottom:-4%; font-size:8px; }.corner-a { top:12%; }.corner-b { bottom:26%; } }
+@media(prefers-reduced-motion:reduce) { .code-fragment { animation:none; } }

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useSpring, useReducedMotion } from "framer-motion";
 import { AmbientExperience, OrbitDetails } from "./AmbientExperience";
-import { ArrowDown, ArrowUpRight, ArrowRight, Check, Copy, X, Menu, Sparkles, Cpu, Code2, Layers, Database, MapPin, Download, Github, Linkedin, Phone } from "lucide-react";
+import { ArrowDown, ArrowUpRight, ArrowRight, Check, Copy, X, Menu, Sparkles, Cpu, Code2, Layers, Database, MapPin, Download, Github, Linkedin, Phone, RotateCcw } from "lucide-react";
 import { projects, profile, skills } from "@/data/portfolio";
 import { SignalOrb } from "./SignalOrb";
 import { ProjectArtwork } from "./ProjectArtwork";
@@ -38,6 +38,7 @@ function Reveal({ children, className = "" }: { children: React.ReactNode; class
 export function Portfolio() {
   const [menu, setMenu] = useState(false);
   const [orbMode, setOrbMode] = useState(0);
+  const [replay, setReplay] = useState(0);
   const [active, setActive] = useState("home");
   const [selected, setSelected] = useState<Project | null>(null);
   const [copied, setCopied] = useState(false);
@@ -78,7 +79,17 @@ export function Portfolio() {
             <div className="hero-actions"><a className="button button-primary" href="#work">Explore my work <ArrowDown size={17} /></a><a className="text-link" href="/Vaibhav-Pandey-CV.docx" download>Download CV <Download size={15} /></a></div>
             <ContactLinks compact />
           </div>
-          <div className="hero-scene"><SignalOrb mode={orbMode} /><OrbitDetails /><span className="scene-coordinate coordinate-top">FIG. 001 — LANGUAGES IN MOTION</span><span className="scene-coordinate coordinate-side">28.47° N / 77.50° E</span><div className="scene-caption"><span className="scene-cross">+</span><span>Human curiosity.<br /><strong>Machine possibilities.</strong></span></div><div className="orb-controls" aria-label="Choose a programming language">{["C++", "Python"].map((label, index) => <button key={label} onClick={() => setOrbMode(index)} aria-pressed={orbMode === index}><span>0{index + 1}</span>{label}</button>)}</div></div>
+          <div className={`hero-scene language-stage ${orbMode === 1 ? "stage-python" : "stage-cpp"}`}>
+            <SignalOrb mode={orbMode} replay={replay} />
+            <OrbitDetails mode={orbMode} />
+            <div className="particle-controls">
+              <div className="orb-controls" aria-label="Choose a particle sculpture">
+                {["C++", "Python"].map((label, index) => <button key={label} onClick={() => { if (orbMode === index) setReplay(value => value + 1); else setOrbMode(index); }} aria-pressed={orbMode === index}><span>0{index + 1}</span>{label}</button>)}
+              </div>
+              <button className="reform-button" onClick={() => setReplay(value => value + 1)} aria-label="Scatter and reform the particles"><RotateCcw size={14} /><span>Reform</span></button>
+            </div>
+            <p className="particle-hint">Move through the dots. Watch them find their way back.</p>
+          </div>
         </div>
         <div className="hero-bottom"><span>SOFTWARE DEVELOPMENT <i /> APPLIED AI <i /> CREATIVE PROBLEM SOLVING</span><a href="#work">SCROLL TO DISCOVER <ArrowDown size={13} /></a></div>
       </section>
