@@ -284,3 +284,9 @@ html.lenis,html.lenis body { height:auto; }
 .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior:contain; }
 .lenis.lenis-stopped { overflow:hidden; }
 body { isolation:isolate; }
+.language-sculpture { position:absolute; inset:0; }
+.language-sculpture .signal-orb { filter:drop-shadow(0 20px 28px #0005); }
+.language-fallback { position:absolute; inset:22%; display:grid; place-items:center; background:linear-gradient(140deg,#338dd1,#143c74); clip-path:polygon(50% 0,94% 25%,94% 75%,50% 100%,6% 75%,6% 25%); color:white; font-size:clamp(45px,7vw,100px); font-weight:800; letter-spacing:-5px; }
+.python-fallback { background:linear-gradient(140deg,#3776ab 45%,#ffd343 55%); font-size:clamp(25px,4vw,65px); letter-spacing:-2px; }
+.language-sculpture[data-ready="true"] .language-fallback { display:none; }
+.hero { overflow:clip; }

@@ -1,80 +1,146 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import * as THREE from "three";
+import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
+import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
+import fontData from "@/data/helvetiker_bold.typeface.json";
 
 export function SignalOrb({ mode = 0 }: { mode?: number }) {
-  const ref = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const hostRef = useRef<HTMLDivElement>(null);
   const modeRef = useRef(mode);
-  useEffect(() => { modeRef.current = mode; }, [mode]);
+  const redraw = useRef<() => void>(() => {});
+  useEffect(() => { modeRef.current = mode; redraw.current(); }, [mode]);
+
   useEffect(() => {
-    const canvas = ref.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let frame = 0, width = 0, height = 0, visible = true;
+    const canvas = canvasRef.current;
+    const host = hostRef.current;
+    if (!canvas || !host) return;
+    let renderer: THREE.WebGLRenderer;
+    try { renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: "low-power" }); }
+    catch { return; }
+    host.dataset.ready = "true";
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+    renderer.setClearColor(0x000000, 0);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.5;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 50);
+    camera.position.set(0, 0, 8.8);
+    scene.add(new THREE.HemisphereLight(0xcbdcff, 0x32202b, 3));
+    const key = new THREE.DirectionalLight(0xffddc9, 5);
+    key.position.set(-3, 4, 6); scene.add(key);
+    const rim = new THREE.DirectionalLight(0x8db4ff, 4);
+    rim.position.set(4, 1, -2); scene.add(rim);
+    const fill = new THREE.PointLight(0xff9977, 20);
+    fill.position.set(-3, -2, 3); scene.add(fill);
+    const font = new FontLoader().parse(fontData);
+    const materials: THREE.Material[] = [];
+    const material = (color: number, metalness = 0.45) => {
+      const value = new THREE.MeshStandardMaterial({ color, metalness, roughness: 0.27 });
+      materials.push(value); return value;
+    };
+    const white = material(0xf0f6ff, 0.35);
+    const blue = material(0x2879bf);
+    const gold = material(0xffca45);
+    const text = (value: string, size: number, depth: number, surface: THREE.Material) => {
+      const geometry = new TextGeometry(value, { font, size, depth, curveSegments: 8, bevelEnabled: true, bevelThickness: 0.025, bevelSize: 0.014, bevelSegments: 3 });
+      geometry.center();
+      return new THREE.Mesh(geometry, surface);
+    };
+    const cpp = new THREE.Group();
+    const hex = new THREE.Shape();
+    for (let i = 0; i < 6; i++) {
+      const angle = Math.PI / 3 * i + Math.PI / 6;
+      const x = Math.cos(angle) * 1.62, y = Math.sin(angle) * 1.62;
+      if (i === 0) hex.moveTo(x, y); else hex.lineTo(x, y);
+    }
+    hex.closePath();
+    const shieldGeometry = new THREE.ExtrudeGeometry(hex, { depth: 0.23, bevelEnabled: true, bevelSize: 0.08, bevelThickness: 0.07, bevelSegments: 4, steps: 1 });
+    shieldGeometry.center();
+    cpp.add(new THREE.Mesh(shieldGeometry, blue));
+    const cppText = text("C++", 0.93, 0.17, white);
+    cppText.position.z = 0.28; cpp.add(cppText);
+    const outline = new THREE.LineSegments(new THREE.EdgesGeometry(shieldGeometry, 35), new THREE.LineBasicMaterial({ color: 0x9ed5ff, transparent: true, opacity: 0.4 }));
+    cpp.add(outline);
+
+    const python = new THREE.Group();
+    // Two rounded, interlocking snake silhouettes, extruded into solid forms.
+    const snake = new THREE.Shape();
+    snake.moveTo(-0.02, 1.35); snake.quadraticCurveTo(-0.95, 1.35, -0.95, 0.98);
+    snake.lineTo(-0.95, 0.57); snake.lineTo(0.18, 0.57); snake.lineTo(0.18, 0.43);
+    snake.lineTo(-1.15, 0.43); snake.quadraticCurveTo(-1.55, 0.43, -1.55, -0.25);
+    snake.quadraticCurveTo(-1.55, -0.88, -1.14, -0.88); snake.lineTo(-0.77, -0.88);
+    snake.lineTo(-0.77, -0.37); snake.quadraticCurveTo(-0.77, 0.02, -0.33, 0.02);
+    snake.lineTo(0.45, 0.02); snake.quadraticCurveTo(0.9, 0.02, 0.9, 0.45);
+    snake.lineTo(0.9, 0.98); snake.quadraticCurveTo(0.9, 1.35, -0.02, 1.35);
+    const eye = new THREE.Path(); eye.absarc(-0.6, 1.03, 0.085, 0, Math.PI * 2, true); snake.holes.push(eye);
+    const snakeGeometry = new THREE.ExtrudeGeometry(snake, { depth: 0.28, bevelEnabled: true, bevelSize: 0.045, bevelThickness: 0.055, bevelSegments: 4, curveSegments: 16, steps: 1 });
+    const upper = new THREE.Mesh(snakeGeometry, blue);
+    upper.position.set(-0.04, 0.2, 0); python.add(upper);
+    const lower = new THREE.Mesh(snakeGeometry, gold);
+    lower.rotation.z = Math.PI; lower.position.set(0.04, 0.08, -0.02); python.add(lower);
+    const pythonText = text("Python", 0.35, 0.05, white);
+    pythonText.position.set(0, -1.72, 0.2); python.add(pythonText);
+    scene.add(cpp, python);
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let frame = 0, visible = true, disposed = false, previous = 0;
+    let blend = modeRef.current, tiltX = 0, tiltY = 0;
     const pointer = { x: 0, y: 0 };
-    let targetX = 0, targetY = 0;
-    let morph = 0;
-    const particles = Array.from({ length: 950 }, (_, i) => {
-      const y = 1 - (i / 949) * 2;
-      const radius = Math.sqrt(1 - y * y);
-      const angle = Math.PI * (3 - Math.sqrt(5)) * i;
-      return { x: Math.cos(angle) * radius, y, z: Math.sin(angle) * radius };
-    });
     const draw = (time: number) => {
-      if (!visible) return;
-      ctx.clearRect(0, 0, width, height);
-      pointer.x += (targetX - pointer.x) * 0.035;
-      pointer.y += (targetY - pointer.y) * 0.035;
-      const angle = (media.matches ? 0.6 : time * 0.00009) + pointer.x * 0.3;
-      const tilt = 0.32 + pointer.y * 0.2;
-      const r = Math.min(width, height) * 0.34;
-      const cx = width / 2, cy = height / 2;
-      const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, r * 1.6);
-      glow.addColorStop(0, "rgba(255,106,80,0.09)"); glow.addColorStop(1, "rgba(255,106,80,0)");
-      ctx.fillStyle = glow; ctx.fillRect(0, 0, width, height);
-      morph += (modeRef.current - morph) * (media.matches ? 1 : 0.045);
-      const projected = particles.map((p, i) => {
-        const u = (i % 38) / 38 * Math.PI * 2, v = Math.floor(i / 38) / 25 * Math.PI * 2;
-        const torus = { x: (0.78 + 0.29 * Math.cos(v)) * Math.cos(u), y: (0.78 + 0.29 * Math.cos(v)) * Math.sin(u), z: 0.29 * Math.sin(v) };
-        const wave = { x: ((i % 38) / 37 - 0.5) * 2.3, y: Math.sin(u * 1.5 + (media.matches ? 0 : time * 0.001)) * 0.24 + Math.cos(v * 1.5) * 0.18, z: (Math.floor(i / 38) / 24 - 0.5) * 2 };
-        const a = morph <= 1 ? p : torus, b = morph <= 1 ? torus : wave, mix = morph <= 1 ? morph : morph - 1;
-        const point = { x:a.x+(b.x-a.x)*mix, y:a.y+(b.y-a.y)*mix, z:a.z+(b.z-a.z)*mix };
-        const x = point.x * Math.cos(angle) - point.z * Math.sin(angle);
-        const z = point.x * Math.sin(angle) + point.z * Math.cos(angle);
-        return { x, y: point.y * Math.cos(tilt) - z * Math.sin(tilt), z: point.y * Math.sin(tilt) + z * Math.cos(tilt) };
-      }).sort((a, b) => a.z - b.z);
-      for (const p of projected) {
-        const s = 1 + p.z * 0.12;
-        const alpha = 0.12 + ((p.z + 1) / 2) * 0.8;
-        ctx.fillStyle = p.x > 0.25 ? `rgba(255,183,147,${alpha})` : `rgba(255,103,78,${alpha})`;
-        ctx.beginPath(); ctx.arc(cx + p.x * r * s, cy + p.y * r * s, (0.7 + (p.z + 1) * 0.65), 0, Math.PI * 2); ctx.fill();
-      }
-      ctx.save(); ctx.translate(cx, cy); ctx.rotate(-0.4);
-      for (let i = 0; i < 3; i++) {
-        ctx.strokeStyle = `rgba(255,130,100,${0.18 - i * 0.04})`; ctx.lineWidth = 0.7;
-        ctx.beginPath(); ctx.ellipse(0, 0, r * (1.22 + i * 0.12), r * (0.34 + i * 0.025), 0, 0, Math.PI * 2); ctx.stroke();
-      }
-      ctx.restore();
-      if (!media.matches) frame = requestAnimationFrame(draw);
+      frame = 0;
+      if (disposed || !visible || document.hidden) return;
+      const delta = Math.min((time - previous) / 1000, 0.05); previous = time;
+      const ease = reduced.matches ? 1 : 1 - Math.exp(-7 * delta);
+      blend += (modeRef.current - blend) * ease;
+      tiltX += (pointer.y * 0.18 - tiltX) * ease;
+      tiltY += (pointer.x * 0.35 - tiltY) * ease;
+      [cpp, python].forEach((group, index) => {
+        const weight = index === 0 ? 1 - blend : blend;
+        group.visible = weight > 0.005;
+        group.scale.setScalar(0.72 + weight * 0.28);
+        group.position.x = (index - blend) * 6;
+        group.position.y = reduced.matches ? 0 : Math.sin(time * 0.0008) * 0.08;
+        group.rotation.set(reduced.matches ? 0.08 : tiltX + 0.08, reduced.matches ? -0.13 : tiltY + Math.sin(time * 0.00045) * 0.16, reduced.matches ? 0 : Math.sin(time * 0.0006) * 0.025);
+      });
+      renderer.render(scene, camera);
+      if (!reduced.matches) frame = requestAnimationFrame(draw);
     };
+    const start = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(draw); };
+    redraw.current = start;
     const resize = () => {
-      const rect = canvas.getBoundingClientRect(); width = rect.width; height = rect.height;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = width * dpr; canvas.height = height * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      if (media.matches) draw(0);
+      const { width, height } = host.getBoundingClientRect();
+      if (!width || !height) return;
+      renderer.setSize(width, height, false); camera.aspect = width / height;
+      camera.position.z = camera.aspect < 1 ? 8.8 / camera.aspect : 8.8;
+      camera.updateProjectionMatrix(); start();
     };
-    const move = (event: PointerEvent) => { const rect = canvas.getBoundingClientRect(); targetX = (event.clientX - rect.left) / rect.width - 0.5; targetY = (event.clientY - rect.top) / rect.height - 0.5; };
-    const start = () => { cancelAnimationFrame(frame); if (visible) frame = requestAnimationFrame(draw); };
-    const observer = new ResizeObserver(resize); observer.observe(canvas);
-    const intersection = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; start(); }); intersection.observe(canvas);
-    const modeChange = () => { if (media.matches) draw(0); };
-    canvas.addEventListener("pointermove", move); media.addEventListener("change", start);
-    canvas.addEventListener("shapechange", modeChange);
-    resize(); start();
-    return () => { cancelAnimationFrame(frame); observer.disconnect(); intersection.disconnect(); canvas.removeEventListener("pointermove", move); media.removeEventListener("change", start); canvas.removeEventListener("shapechange", modeChange); };
+    const move = (event: PointerEvent) => { if (reduced.matches) return; const rect = host.getBoundingClientRect(); pointer.x = (event.clientX - rect.left) / rect.width - 0.5; pointer.y = (event.clientY - rect.top) / rect.height - 0.5; };
+    const reset = () => { pointer.x = 0; pointer.y = 0; };
+    const observer = new ResizeObserver(resize); observer.observe(host);
+    const intersection = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; start(); }); intersection.observe(host);
+    const lost = (event: Event) => { event.preventDefault(); cancelAnimationFrame(frame); host.dataset.ready = "false"; };
+    const restored = () => { host.dataset.ready = "true"; start(); };
+    canvas.addEventListener("webglcontextlost", lost); canvas.addEventListener("webglcontextrestored", restored);
+    host.addEventListener("pointermove", move); host.addEventListener("pointerleave", reset);
+    reduced.addEventListener("change", start); document.addEventListener("visibilitychange", start);
+    resize();
+    return () => {
+      disposed = true; cancelAnimationFrame(frame); redraw.current = () => {};
+      observer.disconnect(); intersection.disconnect();
+      host.removeEventListener("pointermove", move); host.removeEventListener("pointerleave", reset);
+      reduced.removeEventListener("change", start); document.removeEventListener("visibilitychange", start);
+      canvas.removeEventListener("webglcontextlost", lost); canvas.removeEventListener("webglcontextrestored", restored);
+      const geometries = new Set<THREE.BufferGeometry>();
+      scene.traverse(object => { if (object instanceof THREE.Mesh || object instanceof THREE.LineSegments) geometries.add(object.geometry); });
+      geometries.forEach(geometry => geometry.dispose()); materials.forEach(value => value.dispose()); outline.material.dispose(); renderer.dispose();
+      delete host.dataset.ready;
+    };
   }, []);
-  useEffect(() => { ref.current?.dispatchEvent(new Event("shapechange")); }, [mode]);
-  return <canvas ref={ref} className="signal-orb" aria-hidden="true" />;
+  return <div ref={hostRef} className="language-sculpture" role="img" aria-label={mode === 0 ? "Interactive three-dimensional C++ emblem" : "Interactive three-dimensional Python emblem"}>
+    <canvas ref={canvasRef} className="signal-orb" aria-hidden="true" />
+    <div className={`language-fallback ${mode === 1 ? "python-fallback" : ""}`} aria-hidden="true">{mode === 0 ? "C++" : "Python"}</div>
+  </div>;
 }
